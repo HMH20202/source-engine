@@ -115,7 +115,6 @@ jobs:
           #define GL_BACK 0x0405
           #define GL_FRONT_AND_BACK 0x0408
           
-          // --- Polygon Modes (Fixed!) ---
           #define GL_POINT 0x1B00
           #define GL_LINE 0x1B01
           #define GL_FILL 0x1B02
@@ -194,55 +193,64 @@ jobs:
           #define GL_STENCIL_BACK_FAIL 0x8801
           #define GL_STENCIL_BACK_PASS_DEPTH_FAIL 0x8802
           #define GL_STENCIL_BACK_PASS_DEPTH_PASS 0x8803
-          #define GL_FRAMEBUFFER_EXT 0x8D40
-          #define GL_READ_FRAMEBUFFER_EXT 0x8CA8
-          #define GL_DRAW_FRAMEBUFFER_EXT 0x8CA9
-          #define GL_RENDERBUFFER_EXT 0x8D41
-          #define GL_COLOR_ATTACHMENT0_EXT 0x8CE0
-          #define GL_DEPTH_ATTACHMENT_EXT 0x8D00
-          #define GL_STENCIL_ATTACHMENT_EXT 0x8D20
-          #define GL_ARRAY_BUFFER_ARB 0x8892
-          #define GL_ELEMENT_ARRAY_BUFFER_ARB 0x8893
-          #define GL_TEXTURE0 0x84C0
+          #define GL_STENCIL_BACK_REF 0x8CA3
+          #define GL_STENCIL_BACK_VALUE_MASK 0x8CA4
+          #define GL_STENCIL_BACK_WRITEMASK 0x8CA5
           
-          #define GL_NO_ERROR 0
-          #define GL_VENDOR 0x1F00
-          #define GL_RENDERER 0x1F01
-          #define GL_VERSION 0x1F02
-          #define GL_EXTENSIONS 0x1F03
-          #define GL_FRAMEBUFFER_BINDING 0x8CA6
+          // -------------------------------------------------------
+          // ARB Vertex/Fragment Program (fixed-function assembly path)
+          // -------------------------------------------------------
+          #define GL_VERTEX_PROGRAM_ARB                    0x8620
+          #define GL_FRAGMENT_PROGRAM_ARB                  0x8804
+          #define GL_PROGRAM_FORMAT_ASCII_ARB              0x8875
+          #define GL_PROGRAM_ERROR_POSITION_ARB            0x864B
+          #define GL_PROGRAM_ERROR_STRING_ARB              0x8874
+          #define GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB       0x88B6
           
-          #define GL_PROGRAM_INSTRUCTIONS_ARB 0x880B
-          #define GL_MAX_PROGRAM_INSTRUCTIONS_ARB 0x88A1
-          #define GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB 0x880A
-          #define GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB 0x88A2
-          #define GL_PROGRAM_TEMPORARIES_ARB 0x880F
-          #define GL_MAX_PROGRAM_TEMPORARIES_ARB 0x88A5
-          #define GL_PROGRAM_NATIVE_TEMPORARIES_ARB 0x880E
-          #define GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB 0x88A6
-          #define GL_PROGRAM_PARAMETERS_ARB 0x8809
-          #define GL_MAX_PROGRAM_PARAMETERS_ARB 0x88A9
-          #define GL_PROGRAM_NATIVE_PARAMETERS_ARB 0x8808
-          #define GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB 0x88AA
-          #define GL_PROGRAM_ATTRIBUTES_ARB 0x880D
-          #define GL_MAX_PROGRAM_ATTRIBUTES_ARB 0x88AB
-          #define GL_PROGRAM_NATIVE_ATTRIBUTES_ARB 0x880C
-          #define GL_MAX_PROGRAM_NATIVE_ATTRIBUTES_ARB 0x88AC
-          #define GL_PROGRAM_ADDRESS_REGISTERS_ARB 0x8807
-          #define GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB 0x88AD
-          #define GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB 0x8806
+          // ARB GLSL shader object status (old pre-2.0 API)
+          #define GL_OBJECT_COMPILE_STATUS_ARB             0x8B81
+          #define GL_OBJECT_INFO_LOG_LENGTH_ARB            0x8B84
+          #define GL_OBJECT_LINK_STATUS_ARB                0x8B82
+          
+          // ARB Vertex/Fragment Shader enums
+          #define GL_VERTEX_SHADER_ARB                     0x8B31
+          #define GL_FRAGMENT_SHADER_ARB                   0x8B30
+          
+          // -------------------------------------------------------
+          // ARB Program limits  (ATTRIBS — the short form used by the LMD macro)
+          // NOTE: your old header had GL_PROGRAM_ATTRIBUTES_ARB (wrong name).
+          //       cglmprogram.cpp uses GL_PROGRAM_ATTRIBS_ARB.
+          // -------------------------------------------------------
+          #define GL_PROGRAM_ATTRIBS_ARB                   0x880C
+          #define GL_MAX_PROGRAM_ATTRIBS_ARB               0x88AD
+          #define GL_PROGRAM_NATIVE_ATTRIBS_ARB            0x880D
+          #define GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB        0x88AE
+          
+          // Keep the old ATTRIBUTES names too (different spelling, same values)
+          #define GL_PROGRAM_ATTRIBUTES_ARB                0x880D
+          #define GL_MAX_PROGRAM_ATTRIBUTES_ARB            0x88AB
+          #define GL_PROGRAM_NATIVE_ATTRIBUTES_ARB         0x880C
+          #define GL_MAX_PROGRAM_NATIVE_ATTRIBUTES_ARB     0x88AC
+          
+          #define GL_PROGRAM_PARAMETERS_ARB                0x8809
+          #define GL_MAX_PROGRAM_PARAMETERS_ARB            0x88A9
+          #define GL_PROGRAM_NATIVE_PARAMETERS_ARB         0x8808
+          #define GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB     0x88AA
+          #define GL_PROGRAM_ADDRESS_REGISTERS_ARB         0x8807
+          #define GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB     0x88AD
+          #define GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB  0x8806
           #define GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB 0x88AE
-          #define GL_PROGRAM_ALU_INSTRUCTIONS_ARB 0x8805
-          #define GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB 0x882D
-          #define GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB 0x8804
+          #define GL_PROGRAM_ALU_INSTRUCTIONS_ARB          0x8805
+          #define GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB      0x882D
+          #define GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB   0x8804
           #define GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB 0x882E
-          #define GL_PROGRAM_TEX_INSTRUCTIONS_ARB 0x8803
-          #define GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB 0x882F
-          #define GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB 0x8802
+          #define GL_PROGRAM_TEX_INSTRUCTIONS_ARB          0x8803
+          #define GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB      0x882F
+          #define GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB   0x8802
           #define GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB 0x8830
-          #define GL_PROGRAM_TEX_INDIRECTIONS_ARB 0x8801
-          #define GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB 0x8831
-          #define GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB 0x8800
+          #define GL_PROGRAM_TEX_INDIRECTIONS_ARB          0x8801
+          #define GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB      0x8831
+          #define GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB   0x8800
           #define GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB 0x8832
           
           #define GL_SAMPLES_PASSED_ARB 0x8914
@@ -258,8 +266,6 @@ jobs:
           
           #define GL_PIXEL_UNPACK_BUFFER_ARB 0x88EC
           #define GL_PIXEL_PACK_BUFFER_ARB 0x88EB
-          
-          // --- GOD MODE: BRUTE FORCE EVERYTHING ELSE ---
           
           // Primitives
           #define GL_POINTS 0x0000
@@ -281,11 +287,9 @@ jobs:
           #define GL_CLIP_PLANE4 0x3004
           #define GL_CLIP_PLANE5 0x3005
           
-          // State Machine
           #define GL_DONT_CARE 0x1100
           #define GL_DITHER 0x0BD0
           
-          // Standard VBO Hints
           #define GL_STREAM_DRAW 0x88E0
           #define GL_STREAM_READ 0x88E1
           #define GL_STREAM_COPY 0x88E2
@@ -296,7 +300,6 @@ jobs:
           #define GL_DYNAMIC_READ 0x88E9
           #define GL_DYNAMIC_COPY 0x88EA
           
-          // Textures & Cube Maps
           #define GL_TEXTURE_1D 0x0DE0
           #define GL_TEXTURE_2D 0x0DE1
           #define GL_TEXTURE_3D 0x806F
@@ -310,7 +313,6 @@ jobs:
           #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 0x851A
           #define GL_MAX_CUBE_MAP_TEXTURE_SIZE 0x851C
           
-          // FBO Status and Attachments
           #define GL_FRAMEBUFFER_COMPLETE_EXT 0x8CD5
           #define GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT 0x8CD6
           #define GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT 0x8CD7
@@ -324,7 +326,6 @@ jobs:
           #define GL_COLOR_ATTACHMENT3_EXT 0x8CE3
           #define GL_COLOR_ATTACHMENT4_EXT 0x8CE4
           
-          // Legacy & Compressed Pixel Formats
           #define GL_ALPHA 0x1906
           #define GL_RGB 0x1907
           #define GL_RGBA 0x1908
@@ -337,7 +338,6 @@ jobs:
           #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT 0x83F2
           #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT 0x83F3
           
-          // Debug Output
           #define GL_DEBUG_SOURCE_API_ARB 0x8246
           #define GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB 0x8247
           #define GL_DEBUG_SOURCE_SHADER_COMPILER_ARB 0x8248

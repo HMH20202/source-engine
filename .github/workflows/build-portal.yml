@@ -24,7 +24,6 @@ jobs:
 
       - name: Forge OpenGL Headers for iOS
         run: |
-          # Added EGL and KHR directories for the windowing system
           mkdir -p mock_headers/OpenGL mock_headers/EGL mock_headers/KHR
           
           # Fetch the gl4es headers
@@ -36,9 +35,13 @@ jobs:
           curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/EGL/eglext.h -o mock_headers/EGL/eglext.h
           curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/EGL/eglplatform.h -o mock_headers/EGL/eglplatform.h
           curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/KHR/khrplatform.h -o mock_headers/KHR/khrplatform.h
+          
+          # Download the Google ANGLE specific EGL extension header
+          curl -sL https://raw.githubusercontent.com/google/angle/main/include/EGL/eglext_angle.h -o mock_headers/EGL/eglext_angle.h
 
       - name: Create Force-Include Header
         run: |
+          # The ultimate force-feed header containing all texture, state, blend, depth, and stencil macros
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -120,6 +123,7 @@ jobs:
           #define GL_LINE 0x1B01
           #define GL_FILL 0x1B02
           
+          // --- Alpha, Viewport, Scissor ---
           #define GL_ALPHA_TEST 0x0BC0
           #define GL_ALPHA_TEST_FUNC 0x0BC1
           #define GL_ALPHA_TEST_REF 0x0BC2
@@ -133,6 +137,7 @@ jobs:
           #define GL_VIEWPORT 0x0BA2
           #define GL_DEPTH_RANGE 0x0B70
           
+          // --- Preemptive Strike: Depth, Blend, Stencil, Clear ---
           #define GL_DEPTH_TEST 0x0B71
           #define GL_DEPTH_WRITEMASK 0x0B72
           #define GL_DEPTH_CLEAR_VALUE 0x0B73
@@ -190,6 +195,7 @@ jobs:
           #define GL_DEPTH_BUFFER_BIT 0x0100
           #define GL_STENCIL_BUFFER_BIT 0x0400
           
+          // --- Two-Sided Stencil, FBO, VBO, Multitexture, Clip Planes ---
           #define GL_CLIP_PLANE0 0x3000
           #define GL_STENCIL_BACK_FUNC 0x8800
           #define GL_STENCIL_BACK_FAIL 0x8801

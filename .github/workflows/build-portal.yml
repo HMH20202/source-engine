@@ -26,11 +26,48 @@ jobs:
         run: |
           mkdir -p mock_headers/OpenGL
           
-          # Fetch the gl4es headers which contain ALL standard types (GLenum, GLclampf, etc.)
+          # Fetch the gl4es headers for the standard OpenGL constants (GL_TEXTURE_2D, etc.)
           git clone --depth 1 https://github.com/ptitSeb/gl4es.git mock_gl4es
-          
-          # Copy the actual, valid C++ headers into our mock Apple OpenGL folder
           cp -r mock_gl4es/include/GL/* mock_headers/OpenGL/
+
+      - name: Create Force-Include Header
+        run: |
+          # Generate a C++ header containing ALL missing Apple OpenGL types
+          cat << 'EOF' > force_gl.h
+          #ifndef FORCE_APPLE_GL_H
+          #define FORCE_APPLE_GL_H
+          
+          #include <stdint.h>
+          #include <stddef.h>
+          
+          typedef unsigned int GLenum;
+          typedef unsigned char GLboolean;
+          typedef unsigned int GLbitfield;
+          typedef signed char GLbyte;
+          typedef short GLshort;
+          typedef int GLint;
+          typedef int GLsizei;
+          typedef unsigned char GLubyte;
+          typedef unsigned short GLushort;
+          typedef unsigned int GLuint;
+          typedef float GLfloat;
+          typedef float GLclampf;
+          typedef double GLdouble;
+          typedef double GLclampd;
+          typedef void GLvoid;
+          typedef char GLchar;
+          typedef ptrdiff_t GLsizeiptr;
+          typedef intptr_t GLintptr;
+          
+          typedef unsigned int GLhandleARB;
+          typedef char GLcharARB;
+          
+          #define APIENTRY
+          #define GL_APIENTRY
+          #define GL_APIENTRYP *
+          
+          #endif
+          EOF
 
       - name: Create iOS Dummy Libraries
         run: |
@@ -54,11 +91,9 @@ jobs:
 
       - name: Configure Waf for Portal (iOS)
         run: |
-          # Inject the missing Apple types directly into the compiler's memory
-          export MACRO_HACKS="-DAPIENTRY= -DGLhandleARB=\"unsigned int\" -DGLcharARB=char"
-          
-          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
-          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
+          # The critical addition: -include $PWD/force_gl.h
+          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
+          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
@@ -67,11 +102,9 @@ jobs:
 
       - name: Compile the Engine
         run: |
-          # Keep the hacks active for the build phase!
-          export MACRO_HACKS="-DAPIENTRY= -DGLhandleARB=\"unsigned int\" -DGLcharARB=char"
-          
-          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
-          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
+          # Keep the force-include active for the build phase
+          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
+          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           

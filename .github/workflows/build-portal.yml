@@ -1,7 +1,7 @@
 name: Build Portal for iOS
 
 on:
-  workflow_dispatch: # This allows you to manually trigger the build from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build-ios:
@@ -18,57 +18,48 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Mac/iOS Build Dependencies
+      - name: Install Mac Build Dependencies
+        # We still install these so their headers (.h files) are available for C++ to read
         run: |
           brew install sdl2 freetype fontconfig pkg-config
 
+      - name: Create iOS Dummy Libraries
+        run: |
+          mkdir -p mock_libs
+          cd mock_libs
+          
+          # 1. Compile an empty C file specifically for iOS (arm64)
+          echo "void mock_function(){}" > mock.c
+          xcrun --sdk iphoneos clang -arch arm64 -c mock.c -o mock.o
+          
+          # 2. Forge the static libraries Waf is demanding
+          xcrun ar rcs libfreetype.a mock.o
+          xcrun ar rcs libfreetype2.a mock.o
+          xcrun ar rcs libfontconfig.a mock.o
+          xcrun ar rcs libSDL2.a mock.o
+          xcrun ar rcs libSDL2main.a mock.o
+          cd ..
+
       - name: Configure Waf for Portal (iOS)
         run: |
-          # 1. Create a fake pkg-config directory to spoof the Waf configuration
-          mkdir -p fake_pkgconfig
+          # Inject Homebrew headers so C++ files can read the engine structure
+          export CXXFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          export CFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
           
-          # We supply the Homebrew header paths so the C++ code can compile,
-          # but we leave 'Libs:' empty so the iOS linker doesn't crash on macOS binaries!
-          cat << 'EOF' > fake_pkgconfig/freetype2.pc
-          Name: freetype2
-          Version: 24.3.18
-          Description: freetype2
-          Cflags: -I/opt/homebrew/include/freetype2
-          Libs:
-          EOF
+          # Give Waf our forged libraries and tell the linker to ignore missing symbols
+          export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
+          export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
+          export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
           
-          cat << 'EOF' > fake_pkgconfig/fontconfig.pc
-          Name: fontconfig
-          Version: 2.15.0
-          Description: fontconfig
-          Cflags: -I/opt/homebrew/include
-          Libs:
-          EOF
-          
-          cat << 'EOF' > fake_pkgconfig/sdl2.pc
-          Name: sdl2
-          Version: 2.30.0
-          Description: sdl2
-          Cflags: -I/opt/homebrew/include/SDL2
-          Libs:
-          EOF
-          
-          # 2. Tell Waf to use our spoofed files
-          export PKG_CONFIG_PATH="$PWD/fake_pkgconfig"
-          
-          # 3. Tell the iOS Apple Linker to ignore missing library functions during compilation
-          # (Because your pre-compiled HL2 .ipa already has these functions built into it)
-          export LINKFLAGS="-Wl,-undefined,dynamic_lookup"
-          export LDFLAGS="-Wl,-undefined,dynamic_lookup"
-          
-          # 4. Run the configuration
           python3 waf configure -T release --ios --build-games=portal --disable-warns
 
       - name: Compile the Engine
         run: |
-          # Re-apply the linker flags just to be safe during the build phase
-          export LINKFLAGS="-Wl,-undefined,dynamic_lookup"
-          export LDFLAGS="-Wl,-undefined,dynamic_lookup"
+          # Re-apply flags to ensure the build phase doesn't forget them
+          export CXXFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          export CFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
+          export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           
           python3 waf build -p -v
 

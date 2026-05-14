@@ -32,7 +32,7 @@ jobs:
 
       - name: Create Force-Include Header
         run: |
-          # The clean, Waf-approved header, now with the new LOD and Texture Compare macros!
+          # The clean, Waf-approved header, now with the new Wrap and Anisotropy macros!
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -91,6 +91,17 @@ jobs:
           #define GL_TEXTURE_COMPARE_MODE_ARB 0x884C
           #define GL_TEXTURE_COMPARE_FUNC_ARB 0x884D
           #define GL_COMPARE_R_TO_TEXTURE_ARB 0x884E
+          
+          // --- The Texture Wrap and Anisotropy Constants ---
+          #define GL_REPEAT 0x2901
+          #define GL_CLAMP_TO_EDGE 0x812F
+          #define GL_CLAMP_TO_BORDER 0x812D
+          #define GL_TEXTURE_WRAP_S 0x2802
+          #define GL_TEXTURE_WRAP_T 0x2803
+          #define GL_TEXTURE_WRAP_R 0x8072
+          #define GL_TEXTURE_MIN_FILTER 0x2801
+          #define GL_TEXTURE_MAG_FILTER 0x2800
+          #define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
           
           #define APIENTRY
           #define GL_APIENTRY

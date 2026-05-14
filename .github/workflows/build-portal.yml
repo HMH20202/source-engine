@@ -31,8 +31,8 @@ jobs:
           mkdir -p mock_headers/OpenGL
           cp -r mock_gl4es/include/GL mock_headers/
           
-          # Apple code specifically expects <OpenGL/gl.h>, so we mirror the GL files into the OpenGL folder
-          cp mock_gl4es/include/GL/* mock_headers/OpenGL/
+          # Added the -r flag so it successfully copies subdirectories like /internal
+          cp -r mock_gl4es/include/GL/* mock_headers/OpenGL/
 
       - name: Create iOS Dummy Libraries
         run: |

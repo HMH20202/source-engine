@@ -22,51 +22,56 @@ jobs:
         run: |
           brew install sdl2 freetype fontconfig pkg-config jpeg libpng curl
 
+      - name: Forge OpenGL Headers for iOS
+        run: |
+          # Create fake directories to catch the engine's hardcoded includes
+          mkdir -p mock_headers/GL mock_headers/OpenGL mock_headers/KHR
+          
+          # Download the official standard desktop OpenGL headers
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/gl.h -o mock_headers/GL/gl.h
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/glext.h -o mock_headers/GL/glext.h
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/glcorearb.h -o mock_headers/GL/glcorearb.h
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/KHR/khrplatform.h -o mock_headers/KHR/khrplatform.h
+          
+          # Apple code specifically expects <OpenGL/gl.h>, so we mirror the GL files into the OpenGL folder
+          cp mock_headers/GL/* mock_headers/OpenGL/
+
       - name: Create iOS Dummy Libraries
         run: |
           mkdir -p mock_libs
           cd mock_libs
           
-          # 1. Compile an empty C file specifically for iOS (arm64)
           echo "void mock_function(){}" > mock.c
           xcrun --sdk iphoneos clang -arch arm64 -c mock.c -o mock.o
           
-          # 2. Forge the static libraries Waf is demanding
           xcrun ar rcs libfreetype.a mock.o
           xcrun ar rcs libfreetype2.a mock.o
           xcrun ar rcs libfontconfig.a mock.o
           xcrun ar rcs libSDL2.a mock.o
           xcrun ar rcs libSDL2main.a mock.o
-          
-          # 3. Forge the image/network libraries
           xcrun ar rcs libjpeg.a mock.o
           xcrun ar rcs libpng.a mock.o
           xcrun ar rcs libpng16.a mock.o
           xcrun ar rcs libcurl.a mock.o
-          
-          # 4. Forge the gl4es graphics wrapper
           xcrun ar rcs libgl4es.a mock.o
           cd ..
 
       - name: Configure Waf for Portal (iOS)
         run: |
-          # Inject Homebrew headers so C++ files can read the engine structure
-          export CXXFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
-          export CFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
-          
-          # Give Waf our forged libraries and tell the linker to ignore missing symbols
+          # Notice we added -I$PWD/mock_headers to forcefully inject our downloaded Khronos headers
+          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
           
-          # Added --angle to inject the missing graphics headers and translate OpenGL to Metal
-          python3 waf configure -T release --ios --build-games=portal --disable-warns --skip-sdl2-sanity-check --togles --angle
+          # Removed --angle and --togles so it relies on gl4es as the developer intended
+          python3 waf configure -T release --ios --build-games=portal --disable-warns --skip-sdl2-sanity-check
 
       - name: Compile the Engine
         run: |
-          # Re-apply flags to ensure the build phase doesn't forget them
-          export CXXFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
-          export CFLAGS="-I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           

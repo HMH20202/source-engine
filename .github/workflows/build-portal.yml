@@ -260,6 +260,8 @@ jobs:
           
           // --- Fundamental Textures ---
           #define GL_TEXTURE_2D 0x0DE1
+          #define GL_TEXTURE_3D 0x806F
+          #define GL_TEXTURE_CUBE_MAP 0x8513
           
           // --- Debug Output ---
           #define GL_DEBUG_SOURCE_API_ARB 0x8246
@@ -277,6 +279,23 @@ jobs:
           #define GL_DEBUG_SEVERITY_HIGH_ARB 0x9146
           #define GL_DEBUG_SEVERITY_MEDIUM_ARB 0x9147
           #define GL_DEBUG_SEVERITY_LOW_ARB 0x9148
+          
+          // --- Pixel Formats ---
+          #define GL_ALPHA 0x1906
+          #define GL_RGB 0x1907
+          #define GL_RGBA 0x1908
+          #define GL_LUMINANCE_ALPHA 0x190A
+          #define GL_BGRA 0x80E1
+          
+          // --- FBO Extra Attachments ---
+          #define GL_COLOR_ATTACHMENT1_EXT 0x8CE1
+          #define GL_COLOR_ATTACHMENT2_EXT 0x8CE2
+          #define GL_COLOR_ATTACHMENT3_EXT 0x8CE3
+          
+          // --- Primitive Draw Modes ---
+          #define GL_LINES 0x0001
+          #define GL_TRIANGLES 0x0004
+          #define GL_TRIANGLE_STRIP 0x0005
           
           extern void* l_gl4es;
           typedef void* (*t_glGetProcAddress)(const char*);

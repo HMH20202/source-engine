@@ -26,13 +26,13 @@ jobs:
         run: |
           mkdir -p mock_headers/OpenGL
           
-          # Fetch the gl4es headers for the standard OpenGL constants (GL_TEXTURE_2D, etc.)
+          # Fetch the gl4es headers for the standard OpenGL constants
           git clone --depth 1 https://github.com/ptitSeb/gl4es.git mock_gl4es
           cp -r mock_gl4es/include/GL/* mock_headers/OpenGL/
 
       - name: Create Force-Include Header
         run: |
-          # Generate a C++ header containing ALL missing Apple OpenGL types
+          # Added GLuint64, GLint64, and the standard primitive hex values
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -59,8 +59,20 @@ jobs:
           typedef ptrdiff_t GLsizeiptr;
           typedef intptr_t GLintptr;
           
+          typedef uint64_t GLuint64;
+          typedef int64_t GLint64;
+          
           typedef unsigned int GLhandleARB;
           typedef char GLcharARB;
+          
+          #define GL_BYTE 0x1400
+          #define GL_UNSIGNED_BYTE 0x1401
+          #define GL_SHORT 0x1402
+          #define GL_UNSIGNED_SHORT 0x1403
+          #define GL_INT 0x1404
+          #define GL_UNSIGNED_INT 0x1405
+          #define GL_FLOAT 0x1406
+          #define GL_HALF_FLOAT 0x140B
           
           #define APIENTRY
           #define GL_APIENTRY
@@ -91,7 +103,6 @@ jobs:
 
       - name: Configure Waf for Portal (iOS)
         run: |
-          # The critical addition: -include $PWD/force_gl.h
           export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
           export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
@@ -102,7 +113,6 @@ jobs:
 
       - name: Compile the Engine
         run: |
-          # Keep the force-include active for the build phase
           export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
           export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 -include $PWD/force_gl.h"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"

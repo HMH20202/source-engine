@@ -19,9 +19,9 @@ jobs:
           python-version: '3.x'
 
       - name: Install Mac Build Dependencies
-        # We still install these so their headers (.h files) are available for C++ to read
+        # Added jpeg, libpng, and curl to give C++ access to their headers
         run: |
-          brew install sdl2 freetype fontconfig pkg-config
+          brew install sdl2 freetype fontconfig pkg-config jpeg libpng curl
 
       - name: Create iOS Dummy Libraries
         run: |
@@ -38,6 +38,12 @@ jobs:
           xcrun ar rcs libfontconfig.a mock.o
           xcrun ar rcs libSDL2.a mock.o
           xcrun ar rcs libSDL2main.a mock.o
+          
+          # 3. Forge the newly requested image/network libraries
+          xcrun ar rcs libjpeg.a mock.o
+          xcrun ar rcs libpng.a mock.o
+          xcrun ar rcs libpng16.a mock.o
+          xcrun ar rcs libcurl.a mock.o
           cd ..
 
       - name: Configure Waf for Portal (iOS)

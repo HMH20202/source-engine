@@ -32,7 +32,7 @@ jobs:
 
       - name: Create Force-Include Header
         run: |
-          # The clean, Waf-approved header, now with the missing texture macros!
+          # The clean, Waf-approved header, now with the new LOD and Texture Compare macros!
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -74,13 +74,23 @@ jobs:
           #define GL_FLOAT 0x1406
           #define GL_HALF_FLOAT 0x140B
           
-          // --- The Missing Texture Constants ---
+          // --- The Texture Filter Constants ---
           #define GL_NEAREST 0x2600
           #define GL_LINEAR 0x2601
           #define GL_NEAREST_MIPMAP_NEAREST 0x2700
           #define GL_LINEAR_MIPMAP_NEAREST 0x2701
           #define GL_NEAREST_MIPMAP_LINEAR 0x2702
           #define GL_LINEAR_MIPMAP_LINEAR 0x2703
+          
+          // --- The Texture LOD and Compare Constants ---
+          #define GL_NONE 0x0000
+          #define GL_LEQUAL 0x0203
+          #define GL_TEXTURE_BORDER_COLOR 0x1004
+          #define GL_TEXTURE_MIN_LOD 0x813A
+          #define GL_TEXTURE_LOD_BIAS 0x8501
+          #define GL_TEXTURE_COMPARE_MODE_ARB 0x884C
+          #define GL_TEXTURE_COMPARE_FUNC_ARB 0x884D
+          #define GL_COMPARE_R_TO_TEXTURE_ARB 0x884E
           
           #define APIENTRY
           #define GL_APIENTRY

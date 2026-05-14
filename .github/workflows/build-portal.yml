@@ -24,15 +24,21 @@ jobs:
 
       - name: Forge OpenGL Headers for iOS
         run: |
-          mkdir -p mock_headers/OpenGL
+          # Added EGL and KHR directories for the windowing system
+          mkdir -p mock_headers/OpenGL mock_headers/EGL mock_headers/KHR
           
           # Fetch the gl4es headers
           git clone --depth 1 https://github.com/ptitSeb/gl4es.git mock_gl4es
           cp -r mock_gl4es/include/GL/* mock_headers/OpenGL/
+          
+          # Download official Khronos EGL Windowing Headers
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/EGL/egl.h -o mock_headers/EGL/egl.h
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/EGL/eglext.h -o mock_headers/EGL/eglext.h
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/EGL/eglplatform.h -o mock_headers/EGL/eglplatform.h
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/KHR/khrplatform.h -o mock_headers/KHR/khrplatform.h
 
       - name: Create Force-Include Header
         run: |
-          # The ultimate force-feed header, now with the final ARB/EXT types and Clip Planes!
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -184,7 +190,6 @@ jobs:
           #define GL_DEPTH_BUFFER_BIT 0x0100
           #define GL_STENCIL_BUFFER_BIT 0x0400
           
-          // --- Two-Sided Stencil, FBO, VBO, Multitexture, Clip Planes ---
           #define GL_CLIP_PLANE0 0x3000
           #define GL_STENCIL_BACK_FUNC 0x8800
           #define GL_STENCIL_BACK_FAIL 0x8801

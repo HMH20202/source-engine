@@ -22,22 +22,17 @@ jobs:
         run: |
           brew install sdl2 freetype fontconfig pkg-config jpeg libpng curl
 
-      - name: Forge Empty Mock Headers
+      - name: Forge OpenGL Headers for iOS
         run: |
           mkdir -p mock_headers/OpenGL
-          # We make these empty because our force_gl.h will already contain everything. 
-          # This prevents "file not found" errors if the engine explicitly asks for them.
-          touch mock_headers/OpenGL/gl.h
-          touch mock_headers/OpenGL/glext.h
-          touch mock_headers/OpenGL/glcorearb.h
-
-      - name: Create the Nuclear Force-Include Header
-        run: |
-          # Download Mesa's robust OpenGL headers which contain literally every GL constant and type
-          curl -sL https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/include/GL/gl.h -o mesa_gl.h
-          curl -sL https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/include/GL/glext.h -o mesa_glext.h
           
-          # Build the ultimate force_include file
+          # Fetch the gl4es headers
+          git clone --depth 1 https://github.com/ptitSeb/gl4es.git mock_gl4es
+          cp -r mock_gl4es/include/GL/* mock_headers/OpenGL/
+
+      - name: Create Force-Include Header
+        run: |
+          # The clean, Waf-approved header, now with the missing texture macros!
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -45,31 +40,51 @@ jobs:
           #include <stdint.h>
           #include <stddef.h>
           
-          // Temporarily hide the Apple flag so Mesa doesn't skip Desktop GL features
-          #ifdef __APPLE__
-          #define HIDDEN_APPLE
-          #undef __APPLE__
-          #endif
-          EOF
+          typedef unsigned int GLenum;
+          typedef unsigned char GLboolean;
+          typedef unsigned int GLbitfield;
+          typedef signed char GLbyte;
+          typedef short GLshort;
+          typedef int GLint;
+          typedef int GLsizei;
+          typedef unsigned char GLubyte;
+          typedef unsigned short GLushort;
+          typedef unsigned int GLuint;
+          typedef float GLfloat;
+          typedef float GLclampf;
+          typedef double GLdouble;
+          typedef double GLclampd;
+          typedef void GLvoid;
+          typedef char GLchar;
+          typedef ptrdiff_t GLsizeiptr;
+          typedef intptr_t GLintptr;
           
-          # Violently inject the thousands of lines of official Mesa OpenGL definitions
-          cat mesa_gl.h >> force_gl.h
-          cat mesa_glext.h >> force_gl.h
+          typedef uint64_t GLuint64;
+          typedef int64_t GLint64;
           
-          # Restore Apple flags and add ToGL's custom overrides
-          cat << 'EOF' >> force_gl.h
+          typedef unsigned int GLhandleARB;
+          typedef char GLcharARB;
           
-          // Restore the Apple flag for the rest of the Apple iOS SDK
-          #ifdef HIDDEN_APPLE
-          #define __APPLE__ 1
-          #endif
+          #define GL_BYTE 0x1400
+          #define GL_UNSIGNED_BYTE 0x1401
+          #define GL_SHORT 0x1402
+          #define GL_UNSIGNED_SHORT 0x1403
+          #define GL_INT 0x1404
+          #define GL_UNSIGNED_INT 0x1405
+          #define GL_FLOAT 0x1406
+          #define GL_HALF_FLOAT 0x140B
           
-          // Ensure ToGL's 64-bit and API macros are satisfied
+          // --- The Missing Texture Constants ---
+          #define GL_NEAREST 0x2600
+          #define GL_LINEAR 0x2601
+          #define GL_NEAREST_MIPMAP_NEAREST 0x2700
+          #define GL_LINEAR_MIPMAP_NEAREST 0x2701
+          #define GL_NEAREST_MIPMAP_LINEAR 0x2702
+          #define GL_LINEAR_MIPMAP_LINEAR 0x2703
+          
           #define APIENTRY
           #define GL_APIENTRY
           #define GL_APIENTRYP *
-          typedef uint64_t GLuint64;
-          typedef int64_t GLint64;
           
           #endif
           EOF

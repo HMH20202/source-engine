@@ -34,10 +34,9 @@ jobs:
           curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/EGL/eglplatform.h -o mock_headers/EGL/eglplatform.h
           curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/KHR/khrplatform.h -o mock_headers/KHR/khrplatform.h
           curl -sL https://raw.githubusercontent.com/google/angle/main/include/EGL/eglext_angle.h -o mock_headers/EGL/eglext_angle.h
-
-      - name: Create Force-Include Header
+                - name: Create Force-Include Header
         run: |
-          # The ultimate force-feed header, now with Hardware Strings and Phantom Loader variables!
+          # The ultimate force-feed header, now with ARB Shader Program Limits!
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -205,7 +204,6 @@ jobs:
           #define GL_ELEMENT_ARRAY_BUFFER_ARB 0x8893
           #define GL_TEXTURE0 0x84C0
           
-          // --- Hardware Strings and Bindings ---
           #define GL_NO_ERROR 0
           #define GL_VENDOR 0x1F00
           #define GL_RENDERER 0x1F01
@@ -213,7 +211,40 @@ jobs:
           #define GL_EXTENSIONS 0x1F03
           #define GL_FRAMEBUFFER_BINDING 0x8CA6
           
-          // --- Phantom gl4es Dynamic Loader Variables ---
+          // --- ARB Shader Program Limits ---
+          #define GL_PROGRAM_INSTRUCTIONS_ARB 0x880B
+          #define GL_MAX_PROGRAM_INSTRUCTIONS_ARB 0x88A1
+          #define GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB 0x880A
+          #define GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB 0x88A2
+          #define GL_PROGRAM_TEMPORARIES_ARB 0x880F
+          #define GL_MAX_PROGRAM_TEMPORARIES_ARB 0x88A5
+          #define GL_PROGRAM_NATIVE_TEMPORARIES_ARB 0x880E
+          #define GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB 0x88A6
+          #define GL_PROGRAM_PARAMETERS_ARB 0x8809
+          #define GL_MAX_PROGRAM_PARAMETERS_ARB 0x88A9
+          #define GL_PROGRAM_NATIVE_PARAMETERS_ARB 0x8808
+          #define GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB 0x88AA
+          #define GL_PROGRAM_ATTRIBUTES_ARB 0x880D
+          #define GL_MAX_PROGRAM_ATTRIBUTES_ARB 0x88AB
+          #define GL_PROGRAM_NATIVE_ATTRIBUTES_ARB 0x880C
+          #define GL_MAX_PROGRAM_NATIVE_ATTRIBUTES_ARB 0x88AC
+          #define GL_PROGRAM_ADDRESS_REGISTERS_ARB 0x8807
+          #define GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB 0x88AD
+          #define GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB 0x8806
+          #define GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB 0x88AE
+          #define GL_PROGRAM_ALU_INSTRUCTIONS_ARB 0x8805
+          #define GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB 0x882D
+          #define GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB 0x8804
+          #define GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB 0x882E
+          #define GL_PROGRAM_TEX_INSTRUCTIONS_ARB 0x8803
+          #define GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB 0x882F
+          #define GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB 0x8802
+          #define GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB 0x8830
+          #define GL_PROGRAM_TEX_INDIRECTIONS_ARB 0x8801
+          #define GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB 0x8831
+          #define GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB 0x8800
+          #define GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB 0x8832
+          
           extern void* l_gl4es;
           typedef void* (*t_glGetProcAddress)(const char*);
           extern t_glGetProcAddress _glGetProcAddress;
@@ -224,8 +255,7 @@ jobs:
           
           #endif
           EOF
-
-      - name: Create iOS Dummy Libraries
+                - name: Create iOS Dummy Libraries
         run: |
           mkdir -p mock_libs
           cd mock_libs

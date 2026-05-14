@@ -248,13 +248,16 @@ jobs:
           #define GL_QUERY_RESULT_ARB 0x8866
           #define GL_QUERY_RESULT_AVAILABLE_ARB 0x8867
           
-          // --- VBO Memory Hints ---
           #define GL_STATIC_DRAW_ARB 0x88E4
           #define GL_DYNAMIC_DRAW_ARB 0x88E8
           #define GL_WRITE_ONLY_ARB 0x88B9
           #define GL_BUFFER_SERIALIZED_MODIFY_APPLE 0x8A12
           #define GL_BUFFER_FLUSHING_UNMAP_APPLE 0x8A13
           #define GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD 0x9160
+          
+          // --- Pixel Buffers ---
+          #define GL_PIXEL_UNPACK_BUFFER_ARB 0x88EC
+          #define GL_PIXEL_PACK_BUFFER_ARB 0x88EB
           
           extern void* l_gl4es;
           typedef void* (*t_glGetProcAddress)(const char*);

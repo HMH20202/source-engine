@@ -244,6 +244,11 @@ jobs:
           #define GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB 0x8800
           #define GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB 0x8832
           
+          // --- Occlusion Queries ---
+          #define GL_SAMPLES_PASSED_ARB 0x8914
+          #define GL_QUERY_RESULT_ARB 0x8866
+          #define GL_QUERY_RESULT_AVAILABLE_ARB 0x8867
+          
           extern void* l_gl4es;
           typedef void* (*t_glGetProcAddress)(const char*);
           extern t_glGetProcAddress _glGetProcAddress;

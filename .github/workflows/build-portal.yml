@@ -255,9 +255,28 @@ jobs:
           #define GL_BUFFER_FLUSHING_UNMAP_APPLE 0x8A13
           #define GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD 0x9160
           
-          // --- Pixel Buffers ---
           #define GL_PIXEL_UNPACK_BUFFER_ARB 0x88EC
           #define GL_PIXEL_PACK_BUFFER_ARB 0x88EB
+          
+          // --- Fundamental Textures ---
+          #define GL_TEXTURE_2D 0x0DE1
+          
+          // --- Debug Output ---
+          #define GL_DEBUG_SOURCE_API_ARB 0x8246
+          #define GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB 0x8247
+          #define GL_DEBUG_SOURCE_SHADER_COMPILER_ARB 0x8248
+          #define GL_DEBUG_SOURCE_THIRD_PARTY_ARB 0x8249
+          #define GL_DEBUG_SOURCE_APPLICATION_ARB 0x824A
+          #define GL_DEBUG_SOURCE_OTHER_ARB 0x824B
+          #define GL_DEBUG_TYPE_ERROR_ARB 0x824C
+          #define GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB 0x824D
+          #define GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB 0x824E
+          #define GL_DEBUG_TYPE_PORTABILITY_ARB 0x824F
+          #define GL_DEBUG_TYPE_PERFORMANCE_ARB 0x8250
+          #define GL_DEBUG_TYPE_OTHER_ARB 0x8251
+          #define GL_DEBUG_SEVERITY_HIGH_ARB 0x9146
+          #define GL_DEBUG_SEVERITY_MEDIUM_ARB 0x9147
+          #define GL_DEBUG_SEVERITY_LOW_ARB 0x9148
           
           extern void* l_gl4es;
           typedef void* (*t_glGetProcAddress)(const char*);

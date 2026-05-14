@@ -29,22 +29,6 @@ jobs:
           # Download official Khronos Desktop OpenGL headers
           curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/gl.h -o mock_headers/OpenGL/gl.h
           curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/glext.h -o mock_headers/OpenGL/glext.h
-          
-          # Inject preprocessor overrides at the absolute bottom of the files
-          # This forces the Apple compiler to accept the Windows/Linux ARB types
-          cat << 'EOF' >> mock_headers/OpenGL/gl.h
-          #undef APIENTRY
-          #define APIENTRY
-          #define GLhandleARB unsigned int
-          #define GLcharARB char
-          EOF
-          
-          cat << 'EOF' >> mock_headers/OpenGL/glext.h
-          #undef APIENTRY
-          #define APIENTRY
-          #define GLhandleARB unsigned int
-          #define GLcharARB char
-          EOF
 
       - name: Create iOS Dummy Libraries
         run: |
@@ -68,8 +52,11 @@ jobs:
 
       - name: Configure Waf for Portal (iOS)
         run: |
-          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
-          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          # Inject the missing Apple types directly into the compiler's memory
+          export MACRO_HACKS="-DAPIENTRY= -DGLhandleARB=\"unsigned int\" -DGLcharARB=char"
+          
+          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
+          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
@@ -78,8 +65,10 @@ jobs:
 
       - name: Compile the Engine
         run: |
-          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
-          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2"
+          export MACRO_HACKS="-DAPIENTRY= -DGLhandleARB=\"unsigned int\" -DGLcharARB=char"
+          
+          export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
+          export CFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
           export LINKFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           

@@ -32,7 +32,7 @@ jobs:
 
       - name: Create Force-Include Header
         run: |
-          # The ultimate force-feed header, now with VBOs, FBOs, and Multitexturing!
+          # The ultimate force-feed header, now with the final ARB/EXT types and Clip Planes!
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -64,6 +64,8 @@ jobs:
           
           typedef unsigned int GLhandleARB;
           typedef char GLcharARB;
+          typedef ptrdiff_t GLsizeiptrARB;
+          typedef intptr_t GLintptrARB;
           
           #define GL_BYTE 0x1400
           #define GL_UNSIGNED_BYTE 0x1401
@@ -129,6 +131,7 @@ jobs:
           #define GL_DEPTH_WRITEMASK 0x0B72
           #define GL_DEPTH_CLEAR_VALUE 0x0B73
           #define GL_DEPTH_FUNC 0x0B74
+          #define GL_NEVER 0x0200
           #define GL_LESS 0x0201
           #define GL_EQUAL 0x0202
           #define GL_LEQUAL 0x0203
@@ -137,6 +140,7 @@ jobs:
           #define GL_GEQUAL 0x0206
           #define GL_ALWAYS 0x0207
           #define GL_BLEND 0x0BE2
+          #define GL_BLEND_COLOR 0x8005
           #define GL_BLEND_SRC 0x0BE1
           #define GL_BLEND_DST 0x0BE0
           #define GL_BLEND_EQUATION 0x8009
@@ -174,11 +178,14 @@ jobs:
           #define GL_INVERT 0x150A
           #define GL_INCR_WRAP 0x8507
           #define GL_DECR_WRAP 0x8508
+          #define GL_INCR_WRAP_EXT 0x8507
+          #define GL_DECR_WRAP_EXT 0x8508
           #define GL_COLOR_BUFFER_BIT 0x4000
           #define GL_DEPTH_BUFFER_BIT 0x0100
           #define GL_STENCIL_BUFFER_BIT 0x0400
           
-          // --- Two-Sided Stencil, FBO, VBO, and Multitexture ---
+          // --- Two-Sided Stencil, FBO, VBO, Multitexture, Clip Planes ---
+          #define GL_CLIP_PLANE0 0x3000
           #define GL_STENCIL_BACK_FUNC 0x8800
           #define GL_STENCIL_BACK_FAIL 0x8801
           #define GL_STENCIL_BACK_PASS_DEPTH_FAIL 0x8802

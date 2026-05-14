@@ -22,11 +22,10 @@ jobs:
         run: |
           brew install sdl2 freetype fontconfig pkg-config
 
-      - name: Configure Waf for Portal (iOS)
-        # The key change here is --build-games=portal
+      -       - name: Configure Waf for Portal (iOS)
         run: |
-          python3 waf configure -T release --target-os=ios --build-games=portal --disable-warns
-
+          python3 waf configure -T release --ios --build-games=portal --disable-warns
+          
       - name: Compile the Engine
         run: |
           python3 waf build -p -v

@@ -23,13 +23,53 @@ jobs:
           brew install sdl2 freetype fontconfig pkg-config
 
       - name: Configure Waf for Portal (iOS)
-        # We export the PKG_CONFIG_PATH so Waf can find the Homebrew libraries on the Mac runner
         run: |
-          export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
+          # 1. Create a fake pkg-config directory to spoof the Waf configuration
+          mkdir -p fake_pkgconfig
+          
+          # We supply the Homebrew header paths so the C++ code can compile,
+          # but we leave 'Libs:' empty so the iOS linker doesn't crash on macOS binaries!
+          cat << 'EOF' > fake_pkgconfig/freetype2.pc
+          Name: freetype2
+          Version: 24.3.18
+          Description: freetype2
+          Cflags: -I/opt/homebrew/include/freetype2
+          Libs:
+          EOF
+          
+          cat << 'EOF' > fake_pkgconfig/fontconfig.pc
+          Name: fontconfig
+          Version: 2.15.0
+          Description: fontconfig
+          Cflags: -I/opt/homebrew/include
+          Libs:
+          EOF
+          
+          cat << 'EOF' > fake_pkgconfig/sdl2.pc
+          Name: sdl2
+          Version: 2.30.0
+          Description: sdl2
+          Cflags: -I/opt/homebrew/include/SDL2
+          Libs:
+          EOF
+          
+          # 2. Tell Waf to use our spoofed files
+          export PKG_CONFIG_PATH="$PWD/fake_pkgconfig"
+          
+          # 3. Tell the iOS Apple Linker to ignore missing library functions during compilation
+          # (Because your pre-compiled HL2 .ipa already has these functions built into it)
+          export LINKFLAGS="-Wl,-undefined,dynamic_lookup"
+          export LDFLAGS="-Wl,-undefined,dynamic_lookup"
+          
+          # 4. Run the configuration
           python3 waf configure -T release --ios --build-games=portal --disable-warns
 
       - name: Compile the Engine
         run: |
+          # Re-apply the linker flags just to be safe during the build phase
+          export LINKFLAGS="-Wl,-undefined,dynamic_lookup"
+          export LDFLAGS="-Wl,-undefined,dynamic_lookup"
+          
           python3 waf build -p -v
 
       - name: Package the Binaries

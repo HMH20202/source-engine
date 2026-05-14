@@ -19,7 +19,6 @@ jobs:
           python-version: '3.x'
 
       - name: Install Mac Build Dependencies
-        # Added jpeg, libpng, and curl to give C++ access to their headers
         run: |
           brew install sdl2 freetype fontconfig pkg-config jpeg libpng curl
 
@@ -39,11 +38,14 @@ jobs:
           xcrun ar rcs libSDL2.a mock.o
           xcrun ar rcs libSDL2main.a mock.o
           
-          # 3. Forge the newly requested image/network libraries
+          # 3. Forge the image/network libraries
           xcrun ar rcs libjpeg.a mock.o
           xcrun ar rcs libpng.a mock.o
           xcrun ar rcs libpng16.a mock.o
           xcrun ar rcs libcurl.a mock.o
+          
+          # 4. Forge the gl4es graphics wrapper
+          xcrun ar rcs libgl4es.a mock.o
           cd ..
 
       - name: Configure Waf for Portal (iOS)

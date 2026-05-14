@@ -115,6 +115,11 @@ jobs:
           #define GL_BACK 0x0405
           #define GL_FRONT_AND_BACK 0x0408
           
+          // --- Polygon Modes (Fixed!) ---
+          #define GL_POINT 0x1B00
+          #define GL_LINE 0x1B01
+          #define GL_FILL 0x1B02
+          
           #define GL_ALPHA_TEST 0x0BC0
           #define GL_ALPHA_TEST_FUNC 0x0BC1
           #define GL_ALPHA_TEST_REF 0x0BC2

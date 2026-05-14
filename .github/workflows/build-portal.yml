@@ -59,8 +59,8 @@ jobs:
           export LDFLAGS="-L$PWD/mock_libs -Wl,-undefined,dynamic_lookup"
           export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
           
-          # Added --togles to force the mobile graphics pipeline
-          python3 waf configure -T release --ios --build-games=portal --disable-warns --skip-sdl2-sanity-check --togles
+          # Added --angle to inject the missing graphics headers and translate OpenGL to Metal
+          python3 waf configure -T release --ios --build-games=portal --disable-warns --skip-sdl2-sanity-check --togles --angle
 
       - name: Compile the Engine
         run: |

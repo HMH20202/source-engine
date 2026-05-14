@@ -34,9 +34,9 @@ jobs:
           curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/EGL/eglplatform.h -o mock_headers/EGL/eglplatform.h
           curl -sL https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/KHR/khrplatform.h -o mock_headers/KHR/khrplatform.h
           curl -sL https://raw.githubusercontent.com/google/angle/main/include/EGL/eglext_angle.h -o mock_headers/EGL/eglext_angle.h
-                - name: Create Force-Include Header
+
+      - name: Create Force-Include Header
         run: |
-          # The ultimate force-feed header, now with ARB Shader Program Limits!
           cat << 'EOF' > force_gl.h
           #ifndef FORCE_APPLE_GL_H
           #define FORCE_APPLE_GL_H
@@ -211,7 +211,6 @@ jobs:
           #define GL_EXTENSIONS 0x1F03
           #define GL_FRAMEBUFFER_BINDING 0x8CA6
           
-          // --- ARB Shader Program Limits ---
           #define GL_PROGRAM_INSTRUCTIONS_ARB 0x880B
           #define GL_MAX_PROGRAM_INSTRUCTIONS_ARB 0x88A1
           #define GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB 0x880A
@@ -255,7 +254,8 @@ jobs:
           
           #endif
           EOF
-                - name: Create iOS Dummy Libraries
+
+      - name: Create iOS Dummy Libraries
         run: |
           mkdir -p mock_libs
           cd mock_libs

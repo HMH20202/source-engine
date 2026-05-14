@@ -23,7 +23,9 @@ jobs:
           brew install sdl2 freetype fontconfig pkg-config
 
       - name: Configure Waf for Portal (iOS)
+        # We export the PKG_CONFIG_PATH so Waf can find the Homebrew libraries on the Mac runner
         run: |
+          export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
           python3 waf configure -T release --ios --build-games=portal --disable-warns
 
       - name: Compile the Engine

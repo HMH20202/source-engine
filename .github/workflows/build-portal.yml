@@ -22,17 +22,29 @@ jobs:
         run: |
           brew install sdl2 freetype fontconfig pkg-config jpeg libpng curl
 
-      - name: Forge gl4es Desktop Headers for iOS
+      - name: Forge OpenGL Headers for iOS
         run: |
-          # Fetch the forgiving gl4es headers instead of strict Khronos headers
-          git clone --depth 1 https://github.com/ptitSeb/gl4es.git mock_gl4es
-          
-          # Create fake directories to catch the engine's hardcoded includes
           mkdir -p mock_headers/OpenGL
-          cp -r mock_gl4es/include/GL mock_headers/
           
-          # Added the -r flag so it successfully copies subdirectories like /internal
-          cp -r mock_gl4es/include/GL/* mock_headers/OpenGL/
+          # Download official Khronos Desktop OpenGL headers
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/gl.h -o mock_headers/OpenGL/gl.h
+          curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/glext.h -o mock_headers/OpenGL/glext.h
+          
+          # Inject preprocessor overrides at the absolute bottom of the files
+          # This forces the Apple compiler to accept the Windows/Linux ARB types
+          cat << 'EOF' >> mock_headers/OpenGL/gl.h
+          #undef APIENTRY
+          #define APIENTRY
+          #define GLhandleARB unsigned int
+          #define GLcharARB char
+          EOF
+          
+          cat << 'EOF' >> mock_headers/OpenGL/glext.h
+          #undef APIENTRY
+          #define APIENTRY
+          #define GLhandleARB unsigned int
+          #define GLcharARB char
+          EOF
 
       - name: Create iOS Dummy Libraries
         run: |

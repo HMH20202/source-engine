@@ -26,9 +26,11 @@ jobs:
         run: |
           mkdir -p mock_headers/OpenGL
           
-          # Download official Khronos Desktop OpenGL headers
-          curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/gl.h -o mock_headers/OpenGL/gl.h
-          curl -sL https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/api/GL/glext.h -o mock_headers/OpenGL/glext.h
+          # Fetch the gl4es headers which contain ALL standard types (GLenum, GLclampf, etc.)
+          git clone --depth 1 https://github.com/ptitSeb/gl4es.git mock_gl4es
+          
+          # Copy the actual, valid C++ headers into our mock Apple OpenGL folder
+          cp -r mock_gl4es/include/GL/* mock_headers/OpenGL/
 
       - name: Create iOS Dummy Libraries
         run: |
@@ -65,6 +67,7 @@ jobs:
 
       - name: Compile the Engine
         run: |
+          # Keep the hacks active for the build phase!
           export MACRO_HACKS="-DAPIENTRY= -DGLhandleARB=\"unsigned int\" -DGLcharARB=char"
           
           export CXXFLAGS="-I$PWD/mock_headers -I/opt/homebrew/include -I/opt/homebrew/include/freetype2 -I/opt/homebrew/include/SDL2 $MACRO_HACKS"
